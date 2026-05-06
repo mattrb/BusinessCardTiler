@@ -6,7 +6,7 @@ import io
 import os
 
 # --- Page Configuration ---
-st.set_page_config(page_title="BC Tiler Pro", page_icon="📇")
+st.set_page_config(page_title="BC Tiler", page_icon="📇")
 st.title("📇 Business Card Tiler (85mm x 55mm)")
 st.markdown("Upload a card (PDF or Image). I'll tile it to A4 with cut marks.")
 
@@ -17,7 +17,6 @@ def process_tiling(input_file):
     CARD_SIZE = (1004, 650) 
     
     # Platform-aware Poppler Path
-    # On Mac: /opt/homebrew/bin | On Cloud: it's in the system PATH (None)
     p_path = "/opt/homebrew/bin" if os.path.exists("/opt/homebrew/bin") else None
 
     if input_file.name.lower().endswith('.pdf'):
@@ -53,12 +52,12 @@ def process_tiling(input_file):
             # Cut Marks
             off, lgth = 15, 65
             marks = [
-                (x, y-off, x, y-lgth), (x-off, y, x-lgth, y),
-                (x+CARD_SIZE[0], y-off, x+CARD_SIZE[0], y-lgth),
+                (x, y-off, x, y-lgth), (x-off, y, x-lgth, y), # TL
+                (x+CARD_SIZE[0], y-off, x+CARD_SIZE[0], y-lgth), # TR
                 (x+CARD_SIZE[0]+off, y, x+CARD_SIZE[0]+lgth, y),
-                (x, y+CARD_SIZE[1]+off, x, y+CARD_SIZE[1]+lgth),
+                (x, y+CARD_SIZE[1]+off, x, y+CARD_SIZE[1]+lgth), # BL
                 (x-off, y+CARD_SIZE[1], x-lgth, y+CARD_SIZE[1]),
-                (x+CARD_SIZE[0], y+CARD_SIZE[1]+off, x+CARD_SIZE[0], y+CARD_SIZE[1]+lgth),
+                (x+CARD_SIZE[0], y+CARD_SIZE[1]+off, x+CARD_SIZE[0], y+CARD_SIZE[1]+lgth), # BR
                 (x+CARD_SIZE[0]+off, y+CARD_SIZE[1], x+CARD_SIZE[0]+lgth, y+CARD_SIZE[1])
             ]
             for m in marks:
@@ -83,5 +82,17 @@ if uploaded_file:
                 file_name="Business_Cards_Print_Sheet.jpg",
                 mime="image/jpeg"
             )
+            
+            # --- Printing Instructions Section ---
+            st.divider()
+            st.subheader("🖨️ Printing Instructions")
+            st.info("""
+            **To ensure your cards are the correct size (85mm x 55mm):**
+            1. **Scale Setting:** When the print dialog opens, set **Scale** to **100%** or **Actual Size**. 
+            2. **Do NOT 'Fit to Page':** Using 'Fit' or 'Shrink to Fit' will make your cards smaller than intended.
+            3. **Paper:** Use heavy cardstock (250gsm - 350gsm).
+            4. **Cutting:** Use the black 'L' marks as your guide. Use a metal ruler and craft knife for the most precise results.
+            """)
+            
     except Exception as e:
         st.error(f"Something went wrong: {e}")
